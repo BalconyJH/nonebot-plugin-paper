@@ -1,2 +1,2 @@
-# nonebot-plugin-literature
+# nonebot-plugin-paper
 ## 🚧WIP🚧
