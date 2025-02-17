@@ -1,152 +1,82 @@
-from pathlib import Path
-from typing import Union
-from time import monotonic
-import xml.etree.ElementTree as ET
-from types import SimpleNamespace
+from aioarxiv.models import Paper
+from aioarxiv.utils import create_trace_config
+from aiohttp import ClientError, ClientSession, ClientTimeout
+from nonebot import logger
 
-from nonebot.log import logger
-from aiohttp import (
-    TraceConfig,
-    ClientSession,
-    TraceRequestEndParams,
-    TraceRequestStartParams,
-)
-
-from nonebot_plugin_paper.model import Feed, Entry, Author
+from nonebot_plugin_paper.config import plugin_config
 
 
-async def load_xml(data: Union[str, Path]) -> ET.Element:
+def text_paper_info(paper: Paper) -> str:
     """
-    Load XML data from a string or a file path.
-    :param data: XML data as a string or a file path.
-    :return: The root element of the XML.
-    :raises ET.ParseError: If the string data is not well-formed XML.
-    :raises FileNotFoundError: If the file path does not exist.
-    """
-    if isinstance(data, Path) or (isinstance(data, str) and Path(data).is_file()):
-        if not Path(data).exists():
-            raise FileNotFoundError(f"File not found: {data}")
-        return ET.parse(str(data)).getroot()
-    else:
-        try:
-            return ET.fromstring(data)
-        except ET.ParseError as e:
-            raise ET.ParseError("String data is not well-formed XML.") from e
+    Formats the paper information into a text message.
 
-
-def find_text(element: ET.Element, path: str, namespaces: dict) -> str:
-    """辅助函数，安全地获取XML元素的文本内容，如果找不到则返回空字符串。"""
-    found_element = element.find(path, namespaces)
-    # 确保即使是None也转换为字符串
-    return (
-        found_element.text
-        if found_element is not None and found_element.text is not None
-        else ""
-    )
-
-
-def parse_authors(entry_elem: ET.Element, ns: dict) -> list[Author]:
-    """解析作者信息。"""
-    return [
-        Author(
-            name=find_text(author_elem, "atom:name", ns),
-            affiliation=find_text(author_elem, "arxiv:affiliation", ns),
-        )
-        for author_elem in entry_elem.findall("atom:author", ns)
-    ]
-
-
-def parse_entry(entry_elem: ET.Element, ns: dict) -> Entry:
-    """解析单个条目。"""
-    authors = parse_authors(entry_elem, ns)
-    links = [
-        link.get("href")
-        for link in entry_elem.findall("atom:link", ns)
-        if link.get("href") is not None
-    ]
-    categories = [
-        category.get("term")
-        for category in entry_elem.findall("atom:category", ns)
-        if category.get("term") is not None
-    ]
-    return Entry(
-        title=find_text(entry_elem, "atom:title", ns),
-        id=find_text(entry_elem, "atom:id", ns),
-        published=find_text(entry_elem, "atom:published", ns),
-        updated=find_text(entry_elem, "atom:updated", ns),
-        summary=find_text(entry_elem, "atom:summary", ns),
-        authors=authors,
-        links=links,
-        categories=categories,
-        primary_category=find_text(entry_elem, "arxiv:primary_category", ns),
-        comment=find_text(entry_elem, "arxiv:comment", ns),
-        journal_ref=find_text(entry_elem, "arxiv:journal_ref", ns),
-        doi=find_text(entry_elem, "arxiv:doi", ns),
-    )
-
-
-async def atom_parser(data: ET.Element) -> Feed:
-    """解析 Atom feed。"""
-    ns = {
-        "atom": "http://www.w3.org/2005/Atom",
-        "arxiv": "http://arxiv.org/schemas/atom",
-        "opensearch": "http://a9.com/-/spec/opensearch/1.1/",
-    }
-
-    feed_info = {
-        "title": find_text(data, "atom:title", ns),
-        "id": find_text(data, "atom:id", ns),
-        "updated": find_text(data, "atom:updated", ns),
-        "link": find_text(data, "atom:link", ns),
-        "total_results": int(find_text(data, "opensearch:totalResults", ns) or 0),
-        "start_index": int(find_text(data, "opensearch:startIndex", ns) or 0),
-        "items_per_page": int(find_text(data, "opensearch:itemsPerPage", ns) or 0),
-    }
-
-    entries = [
-        parse_entry(entry_elem, ns) for entry_elem in data.findall("atom:entry", ns)
-    ]
-
-    return Feed(
-        title=feed_info["title"],
-        id=feed_info["id"],
-        updated=feed_info["updated"],
-        link=feed_info["link"],
-        total_results=feed_info["total_results"],
-        start_index=feed_info["start_index"],
-        items_per_page=feed_info["items_per_page"],
-        entries=entries,
-    )
-
-
-def create_trace_config() -> TraceConfig:
-    """
-    创建请求追踪配置。
+    Args:
+        paper: The paper object to format.
 
     Returns:
-        aiohttp.TraceConfig: 请求追踪配置
+        The formatted text message.
     """
+    authors = ", ".join([author.name for author in paper.info.authors])
+    published_date = paper.info.published.strftime("%Y-%m-%d")
+    updated_date = paper.info.updated.strftime("%Y-%m-%d")
+    summary = (
+        f"{paper.info.summary[:250]}..."
+        if len(paper.info.summary) > 200
+        else paper.info.summary
+    )
 
-    async def _on_request_start(
-        session: ClientSession,
-        trace_config_ctx: SimpleNamespace,
-        params: TraceRequestStartParams,
-    ) -> None:
-        logger.debug(f"Starting request: {params.method} {params.url}")
-        trace_config_ctx.start_time = monotonic()
+    template = (
+        f"📄 **Title:** {paper.info.title}\n"
+        f"👥 **Authors:** {authors}\n"
+        f"🏷️ **Categories:** {paper.info.categories.primary.term}\n"
+        f"📅 **Published Date:** {published_date}\n"
+        f"🔄 **Updated Date:** {updated_date}\n"
+        f"📝 **Summary:** {summary}\n"
+    )
 
-    async def _on_request_end(
-        session: ClientSession,
-        trace_config_ctx: SimpleNamespace,
-        params: TraceRequestEndParams,
-    ) -> None:
-        elapsed_time = monotonic() - trace_config_ctx.start_time
-        logger.debug(
-            f"Ending request: {params.response.status} {params.url} - Time elapsed: "
-            f"{elapsed_time:.2f} seconds"
-        )
+    if paper.doi:
+        template += f"🔗 **DOI:** {paper.doi}\n"
+    if paper.journal_ref:
+        template += f"📚 **Journal Reference:** {paper.journal_ref}\n"
+    if paper.pdf_url:
+        template += f"📥 **PDF Download Link:** {paper.pdf_url}\n"
+    if paper.comment:
+        template += f"💬 **Comment:** {paper.comment}\n"
 
-    trace_config = TraceConfig()
-    trace_config.on_request_start.append(_on_request_start)
-    trace_config.on_request_end.append(_on_request_end)
-    return trace_config
+    return template
+
+
+async def connection_verification() -> bool:
+    """
+    Verifies the proxy configuration by sending a request to the arXiv website.
+
+    Returns:
+        True if the proxy is working, False otherwise.
+    """
+    proxy = plugin_config.arxiv_proxy or None
+
+    try:
+        async with (
+            ClientSession(
+                timeout=ClientTimeout(total=10),
+                trace_configs=[create_trace_config()],
+            ) as session,
+            session.request("GET", "https://arxiv.org/", proxy=proxy) as resp,
+        ):
+            if resp.status == 200:
+                logger.info(
+                    "Proxy verification successful"
+                    if proxy
+                    else "arXiv connection verification successful"
+                )
+                return True
+            logger.warning(
+                f"Conection verification failed with status code: {resp.status}"
+            )
+            return False
+    except ClientError as e:
+        logger.error(f"Conection verification failed with client error: {e}")
+    except Exception as e:
+        logger.error(f"Conection verification failed with exception: {e}")
+
+    return False
