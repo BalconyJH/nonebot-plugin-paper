@@ -9,7 +9,6 @@ dependencies = [
     "nonebot2>=2.1.1",
     "nonebot-plugin-localstore>=0.5.1",
     "nonebot-plugin-apscheduler>=0.3.0",
-    "nonebot-plugin-htmlrender>=0.6.0",
     "nonebot-plugin-uninfo>=0.5.0",
     "nonebot-plugin-alconna>=0.53.1",
     "aioarxiv>=0.2.0",
@@ -21,6 +20,7 @@ license = { file = "LICENSE" }
 
 [project.optional-dependencies]
 #sentry = ["nonebot-plugin-sentry>=1.0.0"]
+#playwright = ["nonebot-plugin-htmlrender>=0.1.0"]
 
 [dependency-groups]
 dev = [
