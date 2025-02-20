@@ -11,7 +11,7 @@ DATA_DIR = get_data_dir("nonebot_plugin_paper")
 
 @custom_validation
 class RenderType(str):
-    ALLOWED_VALUES: ClassVar = ["playwright", "pillow", "plaintext"]
+    ALLOWED_VALUES: ClassVar = ["playwright", "pillow", "plaintext", "skia"]
 
     @classmethod
     def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]:
@@ -21,6 +21,8 @@ class RenderType(str):
     def validate(cls, value: str) -> str:
         if value.lower() == "pillow":
             raise NotImplementedError("Pillow render is not implemented yet")
+        if value.lower() == "skia":
+            raise NotImplementedError("Skia render is not implemented yet")
         if value.lower() not in cls.ALLOWED_VALUES:
             raise ValueError(
                 f"Invalid type: {value!r}, must be one of {cls.ALLOWED_VALUES}"

@@ -26,22 +26,22 @@ def text_paper_info(paper: Paper) -> str:
     )
 
     template = (
-        f"📄 **Title:** {paper.info.title}\n"
-        f"👥 **Authors:** {authors}\n"
-        f"🏷️ **Categories:** {paper.info.categories.primary.term}\n"
-        f"📅 **Published Date:** {published_date}\n"
-        f"🔄 **Updated Date:** {updated_date}\n"
-        f"📝 **Summary:** {summary}\n"
+        f"📄 Title: {paper.info.title}\n"
+        f"👥 Authors: {authors}\n"
+        f"🏷️ Categories: {paper.info.categories.primary.term}\n"
+        f"📅 Published Date: {published_date}\n"
+        f"🔄 Updated Date: {updated_date}\n"
+        f"📝 Summary: {summary}\n"
     )
 
     if paper.doi:
-        template += f"🔗 **DOI:** {paper.doi}\n"
+        template += f"🔗 DOI: {paper.doi}\n"
     if paper.journal_ref:
-        template += f"📚 **Journal Reference:** {paper.journal_ref}\n"
+        template += f"📚 Journal Reference: {paper.journal_ref}\n"
     if paper.pdf_url:
-        template += f"📥 **PDF Download Link:** {paper.pdf_url}\n"
+        template += f"📥 PDF Download Link: {paper.pdf_url}\n"
     if paper.comment:
-        template += f"💬 **Comment:** {paper.comment}\n"
+        template += f"💬 Comment: {paper.comment}\n"
 
     return template
 
