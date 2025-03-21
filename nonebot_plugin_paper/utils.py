@@ -1,3 +1,5 @@
+from typing import Callable
+
 from aioarxiv.models import Paper
 from aioarxiv.utils import create_trace_config
 from aiohttp import ClientError, ClientSession, ClientTimeout
@@ -80,3 +82,21 @@ async def connection_verification() -> bool:
         logger.error(f"Conection verification failed with exception: {e}")
 
     return False
+
+
+async def get_llm_summary(func: Callable, paper: Paper) -> str:
+    """
+    Get the summary of the paper and pass it to the llm api function.
+
+    Args:
+        func: The function to pass the summary to.
+        paper: The paper object to get the summary from.
+
+    Returns:
+        The result of the llm response.
+    """
+    return await func(
+        paper.info.title,
+        paper.info.summary,
+        paper.info.authors,
+    )
