@@ -2,7 +2,8 @@ from aioarxiv.client.arxiv_client import ArxivClient
 from arclet.alconna import Alconna, Args, Subcommand
 from nonebot.log import logger
 from nonebot.typing import T_State
-from nonebot_plugin_alconna import UniMsg, on_alconna
+from nonebot_plugin_alconna import Image, UniMessage, UniMsg, on_alconna
+from nonebot_plugin_htmlrender import capture_element
 from nonebot_plugin_uninfo import Uninfo
 
 from nonebot_plugin_paper.utils import text_paper_info
@@ -37,3 +38,13 @@ async def handle_search(keyword: str, state: T_State, uninfo: Uninfo, unimsg: Un
         )
         for paper in result.papers:
             await paper_cmd.send(text_paper_info(paper))
+
+
+@paper_cmd.assign("id")
+async def handle_id(paper_id: str, state: T_State, uninfo: Uninfo, unimsg: UniMsg):
+    logger.debug(f"Searching for {paper_id} by {uninfo.user.id}")
+    img = await capture_element(
+        f"https://arxiv.org/abs/{paper_id}",
+        element="#abs-outer > div.leftcolumn",
+    )
+    await UniMessage(Image(raw=img)).finish(reply_to=True)
