@@ -1,0 +1,50 @@
+site_name: nonebot-plugin-paper
+repo_url: https://github.com/BalconyJH/nonebot-plugin-paper
+site_url: https://BalconyJH.github.io/nonebot-plugin-paper
+site_description: Build a world of open science.
+site_author: BalconyJH
+edit_uri: edit/main/docs/
+repo_name: BalconyJH/nonebot-plugin-paper
+copyright: Maintained by <a href="https://github.com/BalconyJH">BalconyJH</a>.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings
+
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/BalconyJH/nonebot-plugin-paper
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/nonebot-plugin-paper
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
