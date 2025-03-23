@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aioarxiv.client.arxiv_client import ArxivClient, SortCriterion, SortOrder
 from arclet.alconna import Alconna, Args, Subcommand
 from nonebot.log import logger
@@ -47,9 +49,9 @@ async def handle_search(
     uninfo: Uninfo,
     unimsg: UniMsg,
     number: Query[int] = AlconnaQuery("number", 1),
-    sort: Query[SortCriterion | None] = AlconnaQuery("sort", None),
-    order: Query[SortOrder | None] = AlconnaQuery("order", None),
-    start: Query[int | None] = AlconnaQuery("start", None),
+    sort: Query[Optional[SortCriterion]] = AlconnaQuery("sort", None),
+    order: Query[Optional[SortOrder]] = AlconnaQuery("order", None),
+    start: Query[Optional[int]] = AlconnaQuery("start", None),
 ):
     logger.debug(f"Searching for {keyword} by {uninfo.user.id}")
     async with ArxivClient() as client:
@@ -68,10 +70,10 @@ async def handle_search(
 
 
 @paper_cmd.assign("id")
-async def handle_id(id: str, state: T_State, uninfo: Uninfo, unimsg: UniMsg):
-    logger.debug(f"Searching for {id} by {uninfo.user.id}")
+async def handle_id(paper_id: str, state: T_State, uninfo: Uninfo, unimsg: UniMsg):
+    logger.debug(f"Searching for {paper_id} by {uninfo.user.id}")
     img = await capture_element(
-        f"https://arxiv.org/abs/{id}",
+        f"https://arxiv.org/abs/{paper_id}",
         element="#abs-outer > div.leftcolumn",
     )
     await UniMessage(Image(raw=img)).finish(reply_to=True)

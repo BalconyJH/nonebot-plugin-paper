@@ -7,7 +7,7 @@ require("nonebot_plugin_uninfo")
 require("nonebot_plugin_apscheduler")
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters
 
-from .command import paper_cmd  # noqa
+from .command import paper_cmd  # noqa: F401
 from .config import Config
 from .utils import connection_verification
 
