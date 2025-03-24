@@ -1,8 +1,10 @@
-from typing import Optional
+from typing import Annotated, Optional
 
 from aioarxiv.client.arxiv_client import ArxivClient, SortCriterion, SortOrder
 from arclet.alconna import Alconna, Args, Subcommand
+from nonebot import on_regex
 from nonebot.log import logger
+from nonebot.params import RegexStr
 from nonebot.typing import T_State
 from nonebot_plugin_alconna import (
     AlconnaQuery,
@@ -16,6 +18,7 @@ from nonebot_plugin_alconna import (
 from nonebot_plugin_htmlrender import capture_element
 from nonebot_plugin_uninfo import Uninfo
 
+from nonebot_plugin_paper.libs.arxiv import ARXIV_LINK_PATTERN
 from nonebot_plugin_paper.utils import text_paper_info
 
 paper_cmd = on_alconna(
@@ -40,6 +43,32 @@ paper_cmd = on_alconna(
     priority=5,
     block=True,
 )
+
+paper = on_regex(
+    rf"{ARXIV_LINK_PATTERN}",
+    priority=5,
+)
+
+
+@paper.handle()
+async def handle_link(
+    state: T_State, uninfo: Uninfo, unimsg: UniMsg, link: Annotated[str, RegexStr()]
+):
+    logger.debug(f"Trigger paper web screenshot by {uninfo.user.id}")
+
+    # replace pdf with abs to the abstract page
+    link = link.replace("pdf", "abs")
+
+    logger.debug(f"Capturing {link}")
+
+    await UniMessage(
+        Image(
+            raw=await capture_element(
+                link,
+                element="#abs-outer > div.leftcolumn",
+            )
+        )
+    ).finish(reply_to=True)
 
 
 @paper_cmd.assign("search")
