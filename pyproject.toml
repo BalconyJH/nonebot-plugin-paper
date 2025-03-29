@@ -32,7 +32,10 @@ license = { file = "LICENSE" }
 [project.optional-dependencies]
 sentry = ["nonebot-plugin-sentry>=2.0.0"]
 playwright = ["nonebot-plugin-htmlrender>=0.6.2"]
-skia = ["skia-python>=134.0b12"]
+skia = [
+    "skia-python>=134.0b12",
+    "matplotlib>=3.9, <3.10"
+]
 
 [dependency-groups]
 dev = [
