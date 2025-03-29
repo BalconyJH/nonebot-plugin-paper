@@ -30,8 +30,9 @@ readme = "README.md"
 license = { file = "LICENSE" }
 
 [project.optional-dependencies]
-sentry = ["nonebot-plugin-sentry>=1.0.0"]
-playwright = ["nonebot-plugin-htmlrender>=0.1.0"]
+sentry = ["nonebot-plugin-sentry>=2.0.0"]
+playwright = ["nonebot-plugin-htmlrender>=0.6.2"]
+skia = ["skia-python>=134.0b12"]
 
 [dependency-groups]
 dev = [
@@ -68,7 +69,6 @@ plugins = ["nonebot_plugin_paper"]
 
 [tool.ruff]
 line-length = 88
-target-version = "py39"
 
 [tool.ruff.format]
 line-ending = "lf"
