@@ -86,16 +86,16 @@ select = [
     "UP", # pyupgrade
     "YTT", # flake8-2020
     "ASYNC", # flake8-async
-    # "S",     # flake8-bandit
+     "S",     # flake8-bandit
     "BLE", # flake8-blind-except
-    # "FBT",   # flake8-boolean-trap
+     "FBT",   # flake8-boolean-trap
     "B", # flake8-bugbear
     "A", # flake8-builtins
     "COM", # flake8-commas
     "C4", # flake8-comprehensions
     "DTZ", # flake8-datetimez
     "T10", # flake8-debugger
-    # "FA",    # flake8-future-annotations
+     "FA",    # flake8-future-annotations
     "ISC", # flake8-implicit-str-concat
     "ICN", # flake8-import-conventions
     "PIE", # flake8-pie
@@ -107,10 +107,10 @@ select = [
     "SLOT", # flake8-slots
     "SIM", # flake8-simplify
     "TID", # flake8-tidy-imports
-    # "TC",   # flake8-type-checking
-    # "ARG",   # flake8-unused-arguments
+     "TC",   # flake8-type-checking
+     "ARG",   # flake8-unused-arguments
     "PTH", # flake8-use-pathlib
-    # "ERA",   # eradicate
+     "ERA",   # eradicate
     "PD", # pandas-vet
     "PGH", # pygrep-hooks
     "PL", # pylint
