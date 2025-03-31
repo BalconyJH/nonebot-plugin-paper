@@ -55,7 +55,7 @@ async def connection_verification() -> bool:
     Returns:
         True if the proxy is working, False otherwise.
     """
-    proxy = plugin_config.arxiv_proxy or None
+    proxy = plugin_config.arxiv_config.proxy or None
 
     try:
         async with (
