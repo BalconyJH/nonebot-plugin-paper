@@ -31,5 +31,8 @@ def render_selector(render_type: str):
 
         return render_paper
 
-    logger.debug("Plain render triggered")
-    return render_plain_paper
+    if render_type == "plaintext":
+        logger.debug("Plaintext render triggered")
+        return render_plain_paper
+
+    raise ValueError(f"Unsupported render type: {render_type}")

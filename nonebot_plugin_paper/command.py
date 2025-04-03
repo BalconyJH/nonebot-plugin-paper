@@ -2,13 +2,14 @@ from typing import Annotated, Optional
 
 from aioarxiv.client.arxiv_client import ArxivClient, SortCriterion, SortOrder
 from aioarxiv.config import ArxivConfig
-from arclet.alconna import Alconna, Args, Subcommand
+from arclet.alconna import Alconna, Args, MultiVar, Subcommand
 from nonebot import on_regex
 from nonebot.log import logger
 from nonebot.params import RegexDict
 from nonebot_plugin_alconna import (
     AlconnaQuery,
     Image,
+    Match,
     Option,
     Query,
     UniMessage,
@@ -33,7 +34,7 @@ paper_cmd = on_alconna(
         "paper",
         Subcommand(
             "-s|--search",
-            Args["keyword", str],
+            Args["keyword", MultiVar("str")],
             Option("--number", Args["number", int]),
             Option(
                 "--sort",
@@ -83,7 +84,7 @@ async def handle_link(match_group: Annotated[dict, RegexDict()]):
 
 @paper_cmd.assign("search")
 async def handle_search(
-    keyword: str,
+    keyword: Match[tuple[str, ...]],
     uninfo: Uninfo,
     number: Query[int] = AlconnaQuery("number", 1),
     sort: Query[Optional[SortCriterion]] = AlconnaQuery("sort", None),
@@ -92,16 +93,21 @@ async def handle_search(
 ):
     logger.debug(f"Searching for {keyword} by {uninfo.user.id}")
 
+    if not keyword.available:
+        await paper_cmd.finish("No keyword provided")
+
+    _keyword = " ".join(keyword.result) if keyword.available else ""
+
     async with arxiv_client:
         result = await arxiv_client.search(
-            keyword,
+            _keyword,
             max_results=number.result,
             sort_by=sort.result,
             sort_order=order.result,
             start=start.result,
         )
         await paper_cmd.send(
-            f"Search result for {keyword} and get {result.total_result} papers"
+            f"Search result for {_keyword} and get {result.total_result} papers"
         )
         for _ in result.papers:
             data = await render_func(_)
@@ -112,8 +118,13 @@ async def handle_search(
 
 
 @paper_cmd.assign("id")
-async def handle_id(paper_id: str, uninfo: Uninfo):
-    logger.debug(f"Searching for {paper_id} by {uninfo.user.id}")
+async def handle_id(paper_id: str):
+    if plugin_config.arxiv_paper_render == "playwright":
+        data = await render_func(paper_id)  # type: ignore
+        if not isinstance(data, str):
+            await UniMessage(Image(raw=data)).finish(reply_to=True)
+        else:
+            await UniMessage("Unhandled error").finish(reply_to=True)
     async with arxiv_client:
         result = await arxiv_client.search(
             id_list=[paper_id],
