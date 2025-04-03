@@ -113,7 +113,7 @@ to：👉 [ArxivConfig Configuration](https://balconyjh.github.io/aioarxiv/confi
 | arxiv_paper_render |    No    |   plaintext   |                                   Paper render type                                    |
 |    arxiv_config    |    No    | ArxivConfig() | Can be passed via nonebot.init(), config model will automatically read dotenv settings |
 
-## 🎉 使用
+## 🎉 Usage
 
 > [!note]
 > Please check your `COMMAND_START` and the above configuration items. Default prefix is
