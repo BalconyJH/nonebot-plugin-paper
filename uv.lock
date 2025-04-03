@@ -8,11 +8,12 @@ resolution-markers = [
 
 [[package]]
 name = "aioarxiv"
-version = "0.2.0"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
+    { name = "defusedxml" },
     { name = "loguru" },
     { name = "platformdirs" },
     { name = "pydantic" },
@@ -20,9 +21,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "tzdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/70/67/568c6235241b5b015b15a8589e73a2755b6b938c010fb6677a30ce333b38/aioarxiv-0.2.0.tar.gz", hash = "sha256:86599d6d784b2cb38ce631a22fd499ef810ea6b1bfbc40500cd0b7d67d32fe9a", size = 33998 }
+sdist = { url = "https://files.pythonhosted.org/packages/fc/04/e4189116a2ba92c741f75e3f4aba788d6120ecc33084e324715752c69fbf/aioarxiv-0.2.1.tar.gz", hash = "sha256:c9d52eff4585d72e017ce60d860fabd640273465eee95e67801eae0007085383", size = 38416 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ba/59/104da49670b14a0161068fe7a56653e36eb89bef9e34c4c5b326bf0f50cf/aioarxiv-0.2.0-py3-none-any.whl", hash = "sha256:85ffee3e6e0312f4b6c3dc9f08dc15c55d9221af09a54a8328bdaf8d52323eea", size = 25561 },
+    { url = "https://files.pythonhosted.org/packages/57/b1/8b9ecf96d0fbc770cbeb9c61f777ce86104c8a7a9cecbe909a33f1b50ce4/aioarxiv-0.2.1-py3-none-any.whl", hash = "sha256:eea9afa5daf994b7723e92e50cc68de6af54279c66592b941e8b2b93cbffd1f4", size = 27333 },
 ]
 
 [[package]]
@@ -665,6 +666,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a9/95/a3dbbb5028f35eafb79008e7522a75244477d2838f38cbb722248dabc2a8/cycler-0.12.1.tar.gz", hash = "sha256:88bb128f02ba341da8ef447245a9e138fae777f6a23943da4540077d3601eb1c", size = 7615 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e7/05/c19819d5e3d95294a6f5947fb9b9629efb316b96de511b418c53d245aae6/cycler-0.12.1-py3-none-any.whl", hash = "sha256:85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30", size = 8321 },
+]
+
+[[package]]
+name = "defusedxml"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/d5/c66da9b79e5bdb124974bfe172b4daf3c984ebd9c2a06e2b8a4dc7331c72/defusedxml-0.7.1.tar.gz", hash = "sha256:1bb3032db185915b62d7c6209c5a8792be6a32ab2fedacc84e01b52c51aa3e69", size = 75520 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/6c/aa3f2f849e01cb6a001cd8554a88d4c77c5c1a31c95bdf1cf9301e6d9ef4/defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61", size = 25604 },
 ]
 
 [[package]]
@@ -1894,6 +1904,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+pillow = [
+    { name = "pillow" },
+]
 playwright = [
     { name = "nonebot-plugin-htmlrender" },
 ]
@@ -1930,7 +1943,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aioarxiv", specifier = ">=0.2.0" },
+    { name = "aioarxiv", specifier = ">=0.2.1" },
     { name = "matplotlib", marker = "extra == 'skia'", specifier = ">=3.9,<3.10" },
     { name = "nonebot-plugin-alconna", specifier = ">=0.53.1" },
     { name = "nonebot-plugin-apscheduler", specifier = ">=0.3.0" },
@@ -1939,10 +1952,11 @@ requires-dist = [
     { name = "nonebot-plugin-sentry", marker = "extra == 'sentry'", specifier = ">=2.0.0" },
     { name = "nonebot-plugin-uninfo", specifier = ">=0.7.2" },
     { name = "nonebot-plugin-waiter", specifier = ">=0.8.1" },
-    { name = "nonebot2", specifier = ">=2.1.1" },
+    { name = "nonebot2", specifier = ">=2.4.0" },
+    { name = "pillow", marker = "extra == 'pillow'", specifier = ">=11.0.0" },
     { name = "skia-python", marker = "extra == 'skia'", specifier = ">=134.0b12" },
 ]
-provides-extras = ["sentry", "playwright", "skia"]
+provides-extras = ["sentry", "playwright", "skia", "pillow"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -2923,15 +2937,15 @@ wheels = [
 
 [[package]]
 name = "sentry-sdk"
-version = "2.24.1"
+version = "2.25.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f1/ef/4847dcd63e3f3c451cf701a825d21200f1322d46ac97586d5c90a13dfea1/sentry_sdk-2.24.1.tar.gz", hash = "sha256:8ba3c29990fa48865b908b3b9dc5ae7fa7e72407c7c9e91303e5206b32d7b8b1", size = 318124 }
+sdist = { url = "https://files.pythonhosted.org/packages/85/2f/a0f732270cc7c1834f5ec45539aec87c360d5483a8bd788217a9102ccfbd/sentry_sdk-2.25.1.tar.gz", hash = "sha256:f9041b7054a7cf12d41eadabe6458ce7c6d6eea7a97cfe1b760b6692e9562cf0", size = 322190 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/95/91137ffe7a5956496155af5ffbe45ee4ddfa795a569136147e766abd14b1/sentry_sdk-2.24.1-py2.py3-none-any.whl", hash = "sha256:36baa6a1128b9d98d2adc5e9b2f887eff0a6af558fc2b96ed51919042413556d", size = 336945 },
+    { url = "https://files.pythonhosted.org/packages/96/b6/84049ab0967affbc7cc7590d86ae0170c1b494edb69df8786707100420e5/sentry_sdk-2.25.1-py2.py3-none-any.whl", hash = "sha256:60b016d0772789454dc55a284a6a44212044d4a16d9f8448725effee97aaf7f6", size = 339851 },
 ]
 
 [package.optional-dependencies]
