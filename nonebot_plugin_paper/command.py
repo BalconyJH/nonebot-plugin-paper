@@ -1,25 +1,32 @@
 from typing import Annotated, Optional
 
 from aioarxiv.client.arxiv_client import ArxivClient, SortCriterion, SortOrder
+from aioarxiv.config import ArxivConfig
 from arclet.alconna import Alconna, Args, Subcommand
 from nonebot import on_regex
 from nonebot.log import logger
-from nonebot.params import RegexStr
-from nonebot.typing import T_State
+from nonebot.params import RegexDict
 from nonebot_plugin_alconna import (
     AlconnaQuery,
     Image,
     Option,
     Query,
     UniMessage,
-    UniMsg,
     on_alconna,
 )
-from nonebot_plugin_htmlrender import capture_element
 from nonebot_plugin_uninfo import Uninfo
 
+from nonebot_plugin_paper.config import plugin_config
 from nonebot_plugin_paper.libs.arxiv import ARXIV_LINK_PATTERN
-from nonebot_plugin_paper.utils import text_paper_info
+from nonebot_plugin_paper.libs.render import render_selector
+
+# Single instance to ensure that rate limiting measures takes effect.
+arxiv_client = ArxivClient(
+    config=ArxivConfig(
+        **plugin_config.arxiv_config.model_dump(),
+    )
+)
+render_func = render_selector(plugin_config.arxiv_paper_render)
 
 paper_cmd = on_alconna(
     Alconna(
@@ -37,7 +44,7 @@ paper_cmd = on_alconna(
         ),
         Subcommand(
             "-id",
-            Args["id", str],
+            Args["paper_id", str],
         ),
     ),
     priority=5,
@@ -51,40 +58,42 @@ paper = on_regex(
 
 
 @paper.handle()
-async def handle_link(
-    state: T_State, uninfo: Uninfo, unimsg: UniMsg, link: Annotated[str, RegexStr()]
-):
-    logger.debug(f"Trigger paper web screenshot by {uninfo.user.id}")
+async def handle_link(match_group: Annotated[dict, RegexDict()]):
+    if plugin_config.arxiv_paper_render == "playwright":
+        data = await render_func(match_group["article_id"])
+        if not isinstance(data, str):
+            await UniMessage(Image(raw=data)).finish(reply_to=True)
+        else:
+            await UniMessage("Unhandled error").finish(reply_to=True)
 
-    # replace pdf with abs to the abstract page
-    link = link.replace("pdf", "abs")
-
-    logger.debug(f"Capturing {link}")
-
-    await UniMessage(
-        Image(
-            raw=await capture_element(
-                link,
-                element="#abs-outer > div.leftcolumn",
-            )
+    async with ArxivClient() as client:
+        result = await client.search(
+            id_list=[match_group["article_id"]],
         )
-    ).finish(reply_to=True)
+        if result.total_result == 0:
+            await paper.finish("No such paper found")
+
+        data = await render_func(result.papers[0])
+
+        if not isinstance(data, str):
+            await UniMessage(Image(raw=data)).finish(reply_to=True)
+        else:
+            await UniMessage(data).finish(reply_to=True)
 
 
 @paper_cmd.assign("search")
 async def handle_search(
     keyword: str,
-    state: T_State,
     uninfo: Uninfo,
-    unimsg: UniMsg,
     number: Query[int] = AlconnaQuery("number", 1),
     sort: Query[Optional[SortCriterion]] = AlconnaQuery("sort", None),
     order: Query[Optional[SortOrder]] = AlconnaQuery("order", None),
     start: Query[Optional[int]] = AlconnaQuery("start", None),
 ):
     logger.debug(f"Searching for {keyword} by {uninfo.user.id}")
-    async with ArxivClient() as client:
-        result = await client.search(
+
+    async with arxiv_client:
+        result = await arxiv_client.search(
             keyword,
             max_results=number.result,
             sort_by=sort.result,
@@ -94,15 +103,28 @@ async def handle_search(
         await paper_cmd.send(
             f"Search result for {keyword} and get {result.total_result} papers"
         )
-        for paper in result.papers:
-            await paper_cmd.send(text_paper_info(paper))
+        for _ in result.papers:
+            data = await render_func(_)
+            if not isinstance(data, str):
+                await UniMessage(Image(raw=data)).finish(reply_to=True)
+            else:
+                await UniMessage(data).finish(reply_to=True)
 
 
 @paper_cmd.assign("id")
-async def handle_id(paper_id: str, state: T_State, uninfo: Uninfo, unimsg: UniMsg):
+async def handle_id(paper_id: str, uninfo: Uninfo):
     logger.debug(f"Searching for {paper_id} by {uninfo.user.id}")
-    img = await capture_element(
-        f"https://arxiv.org/abs/{paper_id}",
-        element="#abs-outer > div.leftcolumn",
-    )
-    await UniMessage(Image(raw=img)).finish(reply_to=True)
+    async with arxiv_client:
+        result = await arxiv_client.search(
+            id_list=[paper_id],
+        )
+
+        if result.total_result == 0:
+            await paper.finish("No such paper found")
+
+        data = await render_func(result.papers[0])
+
+        if not isinstance(data, str):
+            await UniMessage(Image(raw=data)).finish(reply_to=True)
+        else:
+            await UniMessage(data).finish(reply_to=True)

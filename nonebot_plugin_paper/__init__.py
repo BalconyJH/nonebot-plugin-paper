@@ -1,7 +1,6 @@
 from nonebot import get_driver, require
 
 require("nonebot_plugin_alconna")
-require("nonebot_plugin_htmlrender")
 require("nonebot_plugin_localstore")
 require("nonebot_plugin_uninfo")
 require("nonebot_plugin_apscheduler")
@@ -17,6 +16,7 @@ __plugin_meta__ = PluginMetadata(
     usage="""\
     """,
     type="application",
+    homepage="https://github.com/BalconyJH/nonebot-plugin-paper",
     supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
     config=Config,
 )
