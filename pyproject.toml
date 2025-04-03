@@ -49,6 +49,7 @@ dev = [
     "bump-my-version>=0.25.4",
     "tox-uv>=1.11.3",
     "deptry>=0.22.0",
+    "nb-cli>=1.4.2",
 ]
 test = [
     "nonebug>=0.4.2",
