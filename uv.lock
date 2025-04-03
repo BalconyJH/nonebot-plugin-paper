@@ -1980,6 +1980,7 @@ dependencies = [
     { name = "nonebot-plugin-uninfo" },
     { name = "nonebot-plugin-waiter" },
     { name = "nonebot2" },
+    { name = "packaging" },
 ]
 
 [package.optional-dependencies]
@@ -2033,6 +2034,7 @@ requires-dist = [
     { name = "nonebot-plugin-uninfo", specifier = ">=0.7.2" },
     { name = "nonebot-plugin-waiter", specifier = ">=0.8.1" },
     { name = "nonebot2", specifier = ">=2.4.0" },
+    { name = "packaging", specifier = ">=24.2" },
     { name = "pillow", marker = "extra == 'pillow'", specifier = ">=11.0.0" },
     { name = "skia-python", marker = "extra == 'skia'", specifier = ">=134.0b12" },
 ]
