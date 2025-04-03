@@ -14,6 +14,15 @@ else:
 
 
 class DependencyInfo(TypedDict):
+    """Information about a dependency.
+
+    Attributes:
+        min_version: The minimum required version of the dependency.
+        required: Whether the dependency is required.
+        available: Whether the dependency is available in the environment.
+        loaded: Whether the dependency module has been loaded.
+    """
+
     min_version: Optional[str]
     required: bool
     available: bool
@@ -43,11 +52,17 @@ class DependencyManager:
     _initialized: bool = False
 
     def __new__(cls) -> Self:
+        """Creates a singleton instance.
+
+        Returns:
+            Self: The singleton instance of DependencyManager.
+        """
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self) -> None:
+        """Initializes the dependency manager if not already initialized."""
         if self._initialized:
             return
 
@@ -62,7 +77,7 @@ class DependencyManager:
         min_version: Optional[str] = None,
         component: Optional[str] = None,
         *,
-        required: bool = False,
+        required: bool = True,
     ) -> None:
         """Registers a new dependency.
 
@@ -108,6 +123,7 @@ class DependencyManager:
         Raises:
             ValueError: If dependency name is unknown.
         """
+        logger.debug(f"Checking dependency: {name}")
         if name not in self._dependencies:
             raise ValueError(
                 f"Dependency '{name}' not registered. Call register_dependency() first."
@@ -247,7 +263,7 @@ class DependencyManager:
                     dep for dep in dependencies if not self.check_dependency(dep)
                 ]
                 if missing:
-                    raise ImportError(
+                    raise RuntimeError(
                         f"Missing required dependencies for {func.__name__}: {', '.join(missing)}"
                     )
                 return func(*args, **kwargs)
