@@ -1,6 +1,6 @@
 [project]
 name = "nonebot-plugin-paper"
-version = "0.1.0"
+version = "0.1.1"
 description = "build a world of open science."
 authors = [
     { name = "BalconyJH", email = "balconyjh@gmail.com" },
