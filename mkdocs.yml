@@ -12,7 +12,11 @@ nav:
   - Modules: modules.md
 plugins:
   - search
-  - mkdocstrings
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
 
 theme:
   name: material
