@@ -129,7 +129,7 @@ class TextParser:
     async def parse_scientific_text(raw_text: str) -> list[TextElement]:
         """Parse text containing both normal text and mathematical formulas."""
         elements = []
-        raw_text = raw_text.replace("\n", "")
+        raw_text = raw_text.replace("\n", " ")
         parts = re.split(r"(\$+.*?\$+)", raw_text)
 
         for part in parts:
