@@ -17,7 +17,9 @@ __plugin_meta__ = PluginMetadata(
     """,
     type="application",
     homepage="https://github.com/BalconyJH/nonebot-plugin-paper",
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna", "nonebot_plugin_uninfo"
+    ),
     config=Config,
 )
 
