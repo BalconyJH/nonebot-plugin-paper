@@ -1,11 +1,14 @@
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from importlib.util import find_spec
-from typing import Any, Callable, ClassVar
+from typing import Any, ClassVar
 
 from aioarxiv.config import ArxivConfig
 from nonebot import get_driver, get_plugin_config, logger, require
 from nonebot.compat import custom_validation
-from nonebot_plugin_localstore import get_cache_dir, get_data_dir
+from nonebot_plugin_localstore import (
+    get_plugin_cache_dir,
+    get_plugin_data_dir,
+)
 from pydantic import BaseModel, Field
 
 from nonebot_plugin_paper.libs.render.dependency_manager import dependency_manager
@@ -13,8 +16,8 @@ from nonebot_plugin_paper.libs.render.dependency_manager import dependency_manag
 if find_spec("nonebot_plugin_htmlrender"):
     require("nonebot_plugin_htmlrender")
 
-DATA_DIR = get_data_dir("nonebot_plugin_paper")
-CACHE_DIR = get_cache_dir("nonebot_plugin_paper")
+DATA_DIR = get_plugin_data_dir()
+CACHE_DIR = get_plugin_cache_dir()
 
 
 @dependency_manager.requires(
