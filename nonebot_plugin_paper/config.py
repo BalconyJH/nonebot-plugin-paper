@@ -1,5 +1,6 @@
 from collections.abc import Callable, Generator
 from importlib.util import find_spec
+import sys
 from typing import Any, ClassVar
 
 from aioarxiv.config import ArxivConfig
@@ -11,6 +12,11 @@ from nonebot_plugin_localstore import (
 )
 from pydantic import BaseModel, Field
 
+if sys.version_info >= (3, 11):
+    from enum import StrEnum
+else:
+    from strenum import StrEnum
+
 from nonebot_plugin_paper.libs.render.dependency_manager import dependency_manager
 
 if find_spec("nonebot_plugin_htmlrender"):
@@ -20,8 +26,15 @@ DATA_DIR = get_plugin_data_dir()
 CACHE_DIR = get_plugin_cache_dir()
 
 
+class RenderTypeEnum(StrEnum):
+    PLAYWRIGHT = "playwright"
+    PILLOW = "pillow"
+    PLAINTEXT = "plaintext"
+    SKIA = "skia"
+
+
 @dependency_manager.requires(
-    "playwright",
+    RenderTypeEnum.PLAYWRIGHT,
     "nonebot-plugin-htmlrender",
     component="playwright_render",
 )
@@ -30,7 +43,7 @@ def check_playwright():
 
 
 @dependency_manager.requires(
-    "pillow",
+    RenderTypeEnum.PILLOW,
     component="pillow_render",
 )
 def check_pillow():
@@ -38,7 +51,7 @@ def check_pillow():
 
 
 @dependency_manager.requires(
-    "skia-python", "matplotlib", "numpy", component="skia_render"
+    RenderTypeEnum.SKIA, "matplotlib", "numpy", component="skia_render"
 )
 def check_skia():
     pass
@@ -56,7 +69,7 @@ class RenderType(str):
             Note: Pillow is not currently implemented.
     """
 
-    ALLOWED_VALUES: ClassVar = ["playwright", "pillow", "plaintext", "skia"]
+    ALLOWED_VALUES: ClassVar = [e.value for e in RenderTypeEnum]
 
     @classmethod
     def __get_validators__(cls) -> Generator[Callable[..., Any], None, None]:
@@ -73,13 +86,13 @@ class RenderType(str):
             str: The validated rendering method type.
 
         """
-        if value.lower() == "pillow":
+        if value.lower() == RenderTypeEnum.PILLOW:
             raise NotImplementedError("Pillow render is not implemented yet")
 
-        if value.lower() == "playwright":
+        if value.lower() == RenderTypeEnum.PLAYWRIGHT:
             check_playwright()
 
-        if value.lower() == "skia":
+        if value.lower() == RenderTypeEnum.SKIA:
             check_skia()
 
         if value.lower() not in cls.ALLOWED_VALUES:
