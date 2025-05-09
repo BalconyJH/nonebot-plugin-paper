@@ -16,8 +16,7 @@ _✨ NoneBot arXiv Paper Search Plugin ✨_
 </a>
 <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
 <a href="https://github.com/astral-sh/uv">
-  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.
-com/astral-sh/uv/main/assets/badge/v0.json" alt="uv-managed">
+  <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/uv/main/assets/badge/v0.json" alt="uv-managed">
 </a>
 <a href="https://github.com/nonebot/plugin-alconna">
   <img src="https://img.shields.io/badge/Alconna-resolved-2564C2" alt="alc-resolved">
