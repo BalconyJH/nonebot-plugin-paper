@@ -220,3 +220,6 @@ packages = ["nonebot_plugin_paper"]
 
 [tool.hatch.build.targets.sdist]
 only-include = ["nonebot_plugin_paper"]
+
+[tool.uv]
+index-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
