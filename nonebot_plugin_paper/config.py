@@ -19,9 +19,6 @@ else:
 
 from nonebot_plugin_paper.libs.render.dependency_manager import dependency_manager
 
-if find_spec("nonebot_plugin_htmlrender"):
-    require("nonebot_plugin_htmlrender")
-
 DATA_DIR = get_plugin_data_dir()
 CACHE_DIR = get_plugin_cache_dir()
 
@@ -51,7 +48,7 @@ def check_pillow():
 
 
 @dependency_manager.requires(
-    RenderTypeEnum.SKIA, "matplotlib", "numpy", component="skia_render"
+    "skia_python", "matplotlib", "numpy", component="skia_render"
 )
 def check_skia():
     pass
@@ -84,16 +81,17 @@ class RenderType(str):
 
         Returns:
             str: The validated rendering method type.
-
         """
         if value.lower() == RenderTypeEnum.PILLOW:
             raise NotImplementedError("Pillow render is not implemented yet")
 
-        if value.lower() == RenderTypeEnum.PLAYWRIGHT:
-            check_playwright()
-
-        if value.lower() == RenderTypeEnum.SKIA:
-            check_skia()
+        try:
+            if value.lower() == RenderTypeEnum.PLAYWRIGHT:
+                check_playwright()
+            if value.lower() == RenderTypeEnum.SKIA:
+                check_skia()
+        except RuntimeError as e:
+            logger.error(f"Dependency error for render type '{value}': {e}")
 
         if value.lower() not in cls.ALLOWED_VALUES:
             raise ValueError(
@@ -143,3 +141,6 @@ class Config(BaseModel):
 
 global_config = get_driver().config
 plugin_config = get_plugin_config(Config)
+
+if plugin_config.arxiv_paper_render is RenderTypeEnum.PLAYWRIGHT and find_spec("nonebot_plugin_htmlrender"):
+    require("nonebot_plugin_htmlrender")
