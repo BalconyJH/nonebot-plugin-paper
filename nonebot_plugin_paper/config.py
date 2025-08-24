@@ -142,5 +142,7 @@ class Config(BaseModel):
 global_config = get_driver().config
 plugin_config = get_plugin_config(Config)
 
-if plugin_config.arxiv_paper_render is RenderTypeEnum.PLAYWRIGHT and find_spec("nonebot_plugin_htmlrender"):
+if plugin_config.arxiv_paper_render is RenderTypeEnum.PLAYWRIGHT and find_spec(
+    "nonebot_plugin_htmlrender"
+):
     require("nonebot_plugin_htmlrender")
