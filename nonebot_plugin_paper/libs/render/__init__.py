@@ -9,7 +9,7 @@ def render_selector(render_type: str):
     """Render a complete paper with title and summary."""
     if render_type == "playwright":
         logger.debug("Playwright render triggered")
-        from nonebot_plugin_paper.libs.render.html_render import (
+        from nonebot_plugin_paper.libs.render.html_render import (  # noqa: PLC0415
             render_paper,
         )
 
@@ -17,7 +17,7 @@ def render_selector(render_type: str):
 
     if render_type == "pillow":
         logger.debug("Pillow render triggered")
-        from nonebot_plugin_paper.libs.render.pillow_render import (
+        from nonebot_plugin_paper.libs.render.pillow_render import (  # noqa: PLC0415
             render_paper,
         )
 
@@ -25,7 +25,7 @@ def render_selector(render_type: str):
 
     if render_type == "skia":
         logger.debug("Skia render triggered")
-        from nonebot_plugin_paper.libs.render.skia_render import (
+        from nonebot_plugin_paper.libs.render.skia_render import (  # noqa: PLC0415
             render_paper,
         )
 
