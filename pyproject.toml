@@ -21,8 +21,8 @@ dependencies = [
     "aioarxiv>=0.2.1",
     "nonebot-plugin-localstore>=0.5.1",
     "nonebot-plugin-apscheduler>=0.3.0",
-    "nonebot-plugin-uninfo>=0.7.2",
-    "nonebot-plugin-alconna>=0.53.1",
+    "nonebot-plugin-uninfo>=0.9.0",
+    "nonebot-plugin-alconna>=0.59.4",
     "nonebot-plugin-waiter>=0.8.1",
     "packaging>=24.2",
     "strenum>=0.4.15 ; python_full_version < '3.11'",
@@ -44,7 +44,7 @@ pillow = [
 
 [dependency-groups]
 dev = [
-    "nonebot2[fastapi]>=2.4.0",
+    "nonebot2[httpx, fastapi, aiohttp]>=2.4.0",
     "nonebot-adapter-onebot>=2.4.6",
     "ruff>=0.7.4",
     "pre-commit>=4.0.1",
@@ -52,6 +52,7 @@ dev = [
     "tox-uv>=1.11.3",
     "deptry>=0.22.0",
     "nb-cli>=1.4.2",
+    "nonebot-adapter-milky>=0.5.0rc2",
 ]
 test = [
     "nonebug>=0.4.2",
@@ -73,6 +74,7 @@ universal = true
 adapters = [
     { name = "OneBot V12", module_name = "nonebot.adapters.onebot.v12", project_link = "nonebot-adapter-onebot", desc = "OneBot V12 协议" },
     { name = "OneBot V11", module_name = "nonebot.adapters.onebot.v11", project_link = "nonebot-adapter-onebot", desc = "OneBot V11 协议" },
+    { name = "Milky", module_name = "nonebot.adapters.milky", project_link = "nonebot-adapter-milky", desc = "Milky 协议" },
 ]
 plugins = ["nonebot_plugin_paper"]
 
@@ -191,6 +193,10 @@ pythonVersion = "3.9"
 pythonPlatform = "All"
 typeCheckingMode = "standard"
 defineConstant = { PYDANTIC_V2 = true }
+executionEnvironments = [
+    { root = "./tests", extraPaths = ["./"] },
+    { root = "./"},
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
