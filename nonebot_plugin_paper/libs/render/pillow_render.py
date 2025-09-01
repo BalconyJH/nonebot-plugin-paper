@@ -3,4 +3,4 @@ class Render:
 
 
 async def render_paper(paper_id):
-    pass
+    raise NotImplementedError("Pillow render is not implemented yet")
