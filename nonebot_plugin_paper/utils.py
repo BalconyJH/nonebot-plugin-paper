@@ -1,8 +1,10 @@
+import ssl
 from typing import Callable
 
 from aioarxiv.models import Paper
 from aioarxiv.utils import create_trace_config
-from aiohttp import ClientError, ClientSession, ClientTimeout
+from aiohttp import ClientSession, ClientTimeout, TCPConnector
+import certifi
 from nonebot import logger
 
 from nonebot_plugin_paper.config import plugin_config
@@ -22,6 +24,9 @@ async def connection_verification() -> bool:
             ClientSession(
                 timeout=ClientTimeout(total=10),
                 trace_configs=[create_trace_config()],
+                connector=TCPConnector(
+                    ssl=ssl.create_default_context(cafile=certifi.where())
+                ),
             ) as session,
             session.request("GET", "https://arxiv.org/", proxy=proxy) as resp,
         ):
@@ -33,13 +38,11 @@ async def connection_verification() -> bool:
                 )
                 return True
             logger.warning(
-                f"Conection verification failed with status code: {resp.status}"
+                f"Connection verification failed with status code: {resp.status}"
             )
             return False
-    except ClientError as e:
-        logger.error(f"Conection verification failed with client error: {e}")
     except Exception as e:
-        logger.error(f"Conection verification failed with exception: {e}")
+        logger.error(f"Connection verification failed with exception: {e!s}")
 
     return False
 

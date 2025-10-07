@@ -123,7 +123,7 @@ class Config(BaseModel):
     Note:
         - The paper_render setting affects how papers are displayed to users.
         - The arxiv_config setting allows customization of the aioarxiv client,
-            including proxy settings, timeout values, and more. Plugin proxy parms
+            including proxy settings, timeout values, and more. Plugin proxy params
             will be used to set aioarxiv proxy.
 
     See Also:
